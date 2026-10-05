@@ -1,3 +1,13 @@
+# WorshipNow
+
+WorshipNow is worship presentation software with a ProPresenter-style workflow: a continuous playlist view, solid group label bars, click-to-go-live slides, arrow keys that flow from one song into the next, and a clear-layer strip with F1-F6 shortcuts.
+
+WorshipNow is based on [FreeShow](https://github.com/ChurchApps/FreeShow) by ChurchApps and is licensed under the GNU General Public License v3.0 (see `LICENSE`). WorshipNow is not affiliated with or endorsed by ChurchApps or Renewed Vision.
+
+---
+
+## Original FreeShow README
+
 <p align='center'>
  <a href='https://freeshow.app/'>
   <img src='https://github.com/ChurchApps/FreeShow/assets/17619496/02ac9807-1f47-47fc-b895-b35f857c2b57' width=150 />
