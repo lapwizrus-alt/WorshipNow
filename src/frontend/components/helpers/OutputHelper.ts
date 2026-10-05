@@ -13,6 +13,7 @@ import { getAllActiveOutputIds, isOutputBound, setOutput } from "./output"
 import { checkActionTrigger, getFewestOutputLines, getItemWithMostLines, playPdf, updateOut } from "./showActions"
 import { _show } from "./shows"
 import { runActionId } from "../actions/actions"
+import { isPlaylistViewActive } from "../worshipnow/state"
 
 type Options = { isSpace: boolean; slideLayers: boolean; playNext: boolean }
 
@@ -142,7 +143,9 @@ export class OutputHelper {
             return a
         })
 
-        if (get(focusMode)) {
+        // WorshipNow: in the stacked playlist view, behave like ProPresenter and go live on the next/previous item directly
+        const wnPlaylist = !get(focusMode) && isPlaylistViewActive()
+        if (get(focusMode) || wnPlaylist) {
             // skip all sections & skip overlays when going back
             while (projectItems[newIndex]?.type === "section" || (next ? false : projectItems[newIndex]?.type === "overlay")) {
                 this.runSectionAction(projectItems[newIndex])
@@ -151,7 +154,8 @@ export class OutputHelper {
             const newItem = projectItems[newIndex]
             if (!newItem) return
 
-            activeFocus.set({ id: newItem.id, index: newIndex, type: newItem.type || "show" })
+            if (wnPlaylist) openProjectItem(get(activeProject) || "", newIndex)
+            else activeFocus.set({ id: newItem.id, index: newIndex, type: newItem.type || "show" })
 
             // play directly in focus mode
             if ((newItem.type || "show") === "show") {
@@ -236,7 +240,8 @@ export class OutputHelper {
         if (options.isSpace && !this.outShowIsSameAsActive(outSlide, activeOutShow)) return activeOutShow
 
         // prioritize outputted show in focus mode, if not reached end
-        if (get(focusMode) && outSlide && (nextCheck ? this.getSubsequent(outputId, outSlide, nextCheck) : true)) return this.isShow(outSlide) ? outSlide : null
+        // (WorshipNow: the stacked playlist view also advances from the live slide, like ProPresenter)
+        if ((get(focusMode) || isPlaylistViewActive()) && outSlide && (nextCheck ? this.getSubsequent(outputId, outSlide, nextCheck) : true)) return this.isShow(outSlide) ? outSlide : null
 
         // must be a show item
         if (!this.isShow(outSlide)) return activeOutShow

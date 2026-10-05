@@ -155,7 +155,7 @@ export function keydown(e: KeyboardEvent) {
         if (e.key === "Escape" && !contentDisplayed) return hideDisplay()
 
         // allow custom shortcuts through main display (could be useful in some cases when you need output over the main app)
-        const allowThroughWindow = ["Escape", "ArrowRight", "ArrowLeft", " ", "PageDown", "PageUp", "Home", "End", ".", "F1", "F2", "F3", "F4", "F5"]
+        const allowThroughWindow = ["Escape", "ArrowRight", "ArrowLeft", " ", "PageDown", "PageUp", "Home", "End", ".", "F1", "F2", "F3", "F4", "F5", "F6"]
         if (allowThroughWindow.includes(e.key)) send(OUTPUT, ["MAIN_SHORTCUT"], { key: e.key, ctrlKey: e.ctrlKey, metaKey: e.metaKey, altKey: e.altKey })
 
         return
@@ -354,10 +354,11 @@ export const previewShortcuts = {
     ".": () => {
         if (!presentationControllersKeysDisabled()) clearAll()
     },
+    // WorshipNow: ProPresenter-style clear keys
+    // F1 Clear All, F2 Clear Slide, F3 Clear Media, F4 Clear Props, F5 Clear Audio, F6 Clear Timers
     F1: () => {
         if (get(outLocked)) return
-        clearBackground()
-        timelineRecordingAction.set({ id: "clear_background" })
+        clearAll(true)
     },
     F2: () => {
         // return if "rename" is selected
@@ -370,18 +371,24 @@ export const previewShortcuts = {
     },
     F3: () => {
         if (get(outLocked)) return
+        clearBackground()
+        timelineRecordingAction.set({ id: "clear_background" })
+    },
+    F4: () => {
+        if (get(outLocked)) return
         setOutput("overlays", [])
         setOutput("effects", [])
         timelineRecordingAction.set({ id: "clear_overlays" })
     },
-    F4: () => {
+    F5: () => {
         if (get(outLocked)) return
         clearAudio("", { clearPlaylist: true, clearMicrophones: true, commonClear: true })
         timelineRecordingAction.set({ id: "clear_audio" })
     },
-    F5: () => {
-        if (!presentationControllersKeysDisabled()) OutputHelper.advanceOutputs()
-        else setOutput("transition", null)
+    F6: () => {
+        if (get(outLocked)) return
+        setOutput("transition", null)
+        timelineRecordingAction.set({ id: "clear_next_timer" })
     },
 
     " ": (e: KeyboardEvent) => {

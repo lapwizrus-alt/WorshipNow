@@ -25,6 +25,8 @@
     export let showId: string
     export let layout = ""
     export let projectIndex = -1
+    // WorshipNow: rendered inside the stacked playlist view (no own header, no bottom padding)
+    export let embedded = false
 
     $: currentShow = $showsCache[showId]
     $: activeLayout = layout || $showsCache[showId]?.settings?.activeLayout
@@ -501,10 +503,10 @@
 <svelte:window on:keydown={keydown} on:keyup={keyup} on:mousedown={keyup} on:blur={blurred} />
 
 <div class="main" class:padding={!$focusMode} style="display: contents;">
-    <Autoscroll class={$focusMode || isLocked ? "" : "context #shows__close"} {offset} disabled={disableAutoScroll} {shouldSkipSmooth} bind:scrollElem style="display: flex;">
+    <Autoscroll class={$focusMode || isLocked ? "" : "context #shows__close"} offset={embedded ? -1 : offset} disabled={disableAutoScroll || embedded} {shouldSkipSmooth} bind:scrollElem style="display: flex;">
         <DropArea id="all_slides" selectChildren>
             <DropArea id="slides" hoverTimeout={0} selectChildren>
-                {#if !$focusMode}
+                {#if !$focusMode && !embedded}
                     <ShowHeader {showId} hideOptions={!layoutSlides?.length} />
                 {/if}
 
@@ -517,7 +519,7 @@
                         {/if}
                     </Center>
                 {:else}
-                    <div class="grid" style={$focusMode ? "" : "padding-bottom: 60px;"}>
+                    <div class="grid" class:embedded style={$focusMode || embedded ? "" : "padding-bottom: 60px;"}>
                         {#if layoutSlides.length}
                             {#each layoutSlides as slide, i}
                                 {@const currentSlide = currentShow?.slides?.[slide.id] || (slide.id === "fake_empty" ? { group: null, color: null, settings: {}, notes: "", items: [] } : undefined)}

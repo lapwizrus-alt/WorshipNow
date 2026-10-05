@@ -8,17 +8,18 @@ export const defaultThemes: { [key: string]: Themes } = {
             family: "",
             size: "1em"
         },
+        // WorshipNow: ProPresenter-style neutral grays with a blue accent
         colors: {
-            primary: "#242832",
-            "primary-lighter": "#2f3542",
-            "primary-darker": "#191923",
-            "primary-darkest": "#12121c",
-            text: "#f0f0ff",
+            primary: "#383838",
+            "primary-lighter": "#555555",
+            "primary-darker": "#1e1e1e",
+            "primary-darkest": "#121212",
+            text: "#ececec",
             textInvert: "#131313",
-            "secondary-text": "#f0f0ff",
-            secondary: "#F0008C",
-            "secondary-opacity": "rgba(240, 0, 140, 0.5)",
-            hover: "rgb(255 255 255 / 0.05)",
+            "secondary-text": "#ffffff",
+            secondary: "#2f7cf6",
+            "secondary-opacity": "rgba(47, 124, 246, 0.5)",
+            hover: "rgb(255 255 255 / 0.06)",
             focus: "rgb(255 255 255 / 0.1)"
         }
     },

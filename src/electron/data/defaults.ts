@@ -2,15 +2,16 @@ import type { SaveListSettings, SaveListSyncedSettings } from "../../types/Save"
 
 export const defaultConfig = { loaded: false, maximized: true, bounds: { width: 800, height: 600, x: 0, y: 0 }, dataPath: null, disableHardwareAcceleration: null, graphicsDevice: null }
 
+// WorshipNow: distinct, ProPresenter-style group colors (solid label bars)
 export const defaultGroups = {
-    break: { name: "break", default: true, color: "#f5255e" },
-    bridge: { name: "bridge", default: true, color: "#f52598", shortcut: "B" },
-    chorus: { name: "chorus", default: true, color: "#f525d2", shortcut: "C" },
-    intro: { name: "intro", default: true, color: "#d525f5" },
-    outro: { name: "outro", default: true, color: "#a525f5" },
-    pre_chorus: { name: "pre_chorus", default: true, color: "#8825f5" },
-    tag: { name: "tag", default: true, color: "#7525f5" },
-    verse: { name: "verse", default: true, color: "#5825f5", shortcut: "V" }
+    break: { name: "break", default: true, color: "#5a5a5a" },
+    bridge: { name: "bridge", default: true, color: "#6d1fa6", shortcut: "B" },
+    chorus: { name: "chorus", default: true, color: "#b30c48", shortcut: "C" },
+    intro: { name: "intro", default: true, color: "#0a8a8a" },
+    outro: { name: "outro", default: true, color: "#4f5b66" },
+    pre_chorus: { name: "pre_chorus", default: true, color: "#c7660b" },
+    tag: { name: "tag", default: true, color: "#2a8c55" },
+    verse: { name: "verse", default: true, color: "#0e6bb3", shortcut: "V" }
 }
 
 export const defaultSettings: { [key in SaveListSettings]: any } = {
@@ -21,7 +22,7 @@ export const defaultSettings: { [key in SaveListSettings]: any } = {
             enabled: true,
             active: true,
             name: "Primary",
-            color: "#F0008C",
+            color: "#F5A623",
             bounds: { x: 0, y: 0, width: 1920, height: 1080 },
             screen: null,
             style: "default",
@@ -43,8 +44,8 @@ export const defaultSettings: { [key in SaveListSettings]: any } = {
     mediaFolders: {},
     audioFolders: {},
     resized: {
-        leftPanel: 290,
-        rightPanel: 290,
+        leftPanel: 230, // WorshipNow: narrow library/playlist column
+        rightPanel: 440, // WorshipNow: wide preview column
         leftPanelDrawer: 290,
         rightPanelDrawer: 290
     },
@@ -56,7 +57,7 @@ export const defaultSettings: { [key in SaveListSettings]: any } = {
     customFonts: [],
     labelsDisabled: false,
     groupNumbers: true,
-    fullColors: false,
+    fullColors: true, // WorshipNow: ProPresenter-style solid group label bars
     formatNewShow: false,
     lockedOverlays: {},
     activeScenes: {},

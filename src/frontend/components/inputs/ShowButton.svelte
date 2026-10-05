@@ -72,7 +72,7 @@
                 } else if ($showsCache[show.id]?.reference?.type === "calendar") {
                     custom = true
                     iconID = "event"
-                } else iconID = "noIcon"
+                } else iconID = "showIcon" // WorshipNow: presentation icon instead of an empty circle
             } else if (type === "audio") {
                 iconID = "music"
             } else if (type === "overlay") {
@@ -306,6 +306,11 @@
                     {#if showDuration && Number(showDuration)}
                         <span class="layout">{joinTime(secondsToTime(showDuration))}</span>
                     {/if}
+
+                    <!-- WorshipNow: library (category) name, like ProPresenter's playlist -->
+                    {#if (!type || type === "show") && $categories[$shows[id]?.category || ""]?.name}
+                        <span class="wn-library">{translateText($categories[$shows[id]?.category || ""]?.name || "")}</span>
+                    {/if}
                 {:else}
                     <!-- shows drawer list -->
                     {#if match !== null && ($activeShow?.data?.searchInput ? $activeShow?.id === id : isFirst)}
@@ -358,6 +363,18 @@
 </div>
 
 <style>
+    .wn-library {
+        margin-inline-start: auto;
+        padding-inline-start: 8px;
+        opacity: 0.55;
+        font-size: 0.9em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 45%;
+        flex-shrink: 1;
+    }
+
     .main {
         width: 100%;
 
