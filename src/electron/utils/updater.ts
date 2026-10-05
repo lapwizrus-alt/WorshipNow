@@ -4,8 +4,11 @@ import { isProd } from ".."
 
 // let notification: Notification | null
 
+// WorshipNow: auto-updating is off. FreeShow's updater would install FreeShow over WorshipNow.
+const WORSHIPNOW_AUTO_UPDATE = false
+
 export default async function checkForUpdates() {
-    if (!isProd) return
+    if (!isProd || !WORSHIPNOW_AUTO_UPDATE) return
 
     try {
         await autoUpdater.checkForUpdatesAndNotify()

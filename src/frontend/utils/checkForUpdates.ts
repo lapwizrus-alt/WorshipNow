@@ -27,6 +27,8 @@ export async function getUpdateData(currentVersion: string, includeBeta: boolean
 }
 
 export function checkForUpdates(currentVersion: string) {
+    // WorshipNow: don't announce FreeShow releases as updates
+    return
     if (get(isDev) || get(alertUpdates) === false) return
     const includeBeta = currentVersion.includes("-beta") || get(special).betaVersionAlert
 
