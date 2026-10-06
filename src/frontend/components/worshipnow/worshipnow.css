@@ -57,10 +57,27 @@
     outline-offset: -1px;
     z-index: 2;
 }
-/* selected (not live) slide */
+/* selected slides: a bright blue frame around the whole tile, like ProPresenter.
+   (FreeShow's own highlight sits inside the thumbnail, where it was clipped and only showed as a gray tint) */
 .wn-playlist .grid .slide .isSelected,
 #showArea .grid .slide .isSelected {
-    outline: 2px solid #2f7cf6 !important;
+    outline: none !important;
+    background-color: transparent !important;
+    opacity: 1 !important;
+}
+.wn-playlist .grid > .main:has(.isSelected),
+#showArea .grid > .main:has(.isSelected) {
+    box-shadow: inset 0 0 0 4px #1e7bff;
+    border-radius: 3px;
+}
+
+/* drag-to-select box */
+.wn-marquee {
+    position: absolute;
+    z-index: 50;
+    pointer-events: none;
+    background-color: rgb(255 255 255 / 0.16);
+    border: 1px solid rgb(255 255 255 / 0.45);
 }
 
 /* single presentation view uses the same dark canvas */

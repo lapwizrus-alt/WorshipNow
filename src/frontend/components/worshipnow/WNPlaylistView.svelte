@@ -158,6 +158,8 @@
 
 <style>
     .wn-playlist {
+        /* grow with the content (never shrink to the window), so the bottom bar stays pinned to the bottom */
+        flex: 1 0 auto;
         min-height: calc(100% - 34px);
         padding-bottom: 40px;
         background-color: #1e1e1e;

@@ -1,3 +1,8 @@
+<script context="module" lang="ts">
+    // WorshipNow: the slide a Shift-click range starts from (shared by all slides)
+    let slideAnchor: { index: number; showId: string } | null = null
+</script>
+
 <script lang="ts">
     import { uid } from "uid"
     import type { SelectIds } from "../../../types/Main"
@@ -152,16 +157,15 @@
         }
 
         // WorshipNow: slides select like ProPresenter. A plain click selects that one slide (and goes live),
-        // Ctrl/Cmd-click adds or removes, Shift-click selects a range, and selection stays within one presentation.
+        // Ctrl/Cmd-click adds or removes, Shift-click selects the range from the first clicked slide,
+        // and a selection stays within one presentation.
         if (id === "slide" && !dragged && !rightClick) {
-            const otherShow = $selected.id === "slide" && !!$selected.data?.[0]?.showId && !!data?.showId && $selected.data[0].showId !== data.showId
-            if (otherShow || !(e.ctrlKey || e.metaKey || e.shiftKey)) {
-                selected.set({ id, data: [data] })
-                return
-            }
+            selectSlide(e, data)
+            return
         }
         if (id === "slide" && rightClick && $selected.id === "slide" && $selected.data?.[0]?.showId && data?.showId && $selected.data[0].showId !== data.showId) {
             selected.set({ id, data: [data] })
+            slideAnchor = data
             return
         }
 
@@ -278,6 +282,37 @@
 
         if (!newData?.length) selected.set({ id: null, data: [] })
         else if (newData) selected.set({ id, data: newData })
+    }
+
+    function selectSlide(e: any, data: { index: number; showId: string }) {
+        const current: { index: number; showId: string }[] = $selected.id === "slide" && Array.isArray($selected.data) ? $selected.data : []
+        const sameShow = !current.length || current[0]?.showId === data.showId
+        const toggle = e.ctrlKey || e.metaKey
+
+        if (!sameShow || (!toggle && !e.shiftKey)) {
+            selected.set({ id: "slide", data: [{ index: data.index, showId: data.showId }] })
+            slideAnchor = data
+            return
+        }
+
+        if (e.shiftKey) {
+            const anchor = slideAnchor && slideAnchor.showId === data.showId ? slideAnchor : current[0] || data
+            const from = Math.min(anchor.index, data.index)
+            const to = Math.max(anchor.index, data.index)
+            const range: { index: number; showId: string }[] = []
+            for (let i = from; i <= to; i++) range.push({ index: i, showId: data.showId })
+            // Ctrl+Shift adds the range to the existing selection
+            const base = toggle ? current.filter((a) => a.index < from || a.index > to) : []
+            selected.set({ id: "slide", data: [...base, ...range].sort((a, b) => a.index - b.index) })
+            return
+        }
+
+        // Ctrl/Cmd: toggle this slide
+        const exists = current.some((a) => a.index === data.index)
+        const newData = exists ? current.filter((a) => a.index !== data.index) : [...current, { index: data.index, showId: data.showId }].sort((a, b) => a.index - b.index)
+        slideAnchor = data
+        if (!newData.length) selected.set({ id: null, data: [] })
+        else selected.set({ id: "slide", data: newData })
     }
 
     function deselect(e: any) {

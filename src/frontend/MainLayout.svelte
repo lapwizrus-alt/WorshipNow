@@ -19,6 +19,7 @@
     import WNPlaylistView from "./components/worshipnow/WNPlaylistView.svelte"
     import WNRightPanel from "./components/worshipnow/WNRightPanel.svelte"
     import WNToolbar from "./components/worshipnow/WNToolbar.svelte"
+    import { slideMarquee } from "./components/worshipnow/marquee"
     import { DEFAULT_WIDTH } from "./utils/common"
 
     $: page = $activePage
@@ -67,7 +68,7 @@
                     </div>
                 </Resizeable>
 
-                <div class="center" class:playlistView>
+                <div class="center" class:playlistView use:slideMarquee>
                     {#if page === "show"}
                         {#if $focusMode}
                             <LazyLoad component={() => import("./components/show/focus/FocusMode.svelte")} show={$focusMode} />

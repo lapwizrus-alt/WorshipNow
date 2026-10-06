@@ -274,7 +274,7 @@
     $: highlightColor = $slideDeleteHighlight?.color || "#ff5454"
 </script>
 
-<div class="main" class:active class:focused style="{output?.color ? 'outline: 2px solid ' + getOutputColor(output.color) + ';' : ''}width: {viewMode === 'grid' || viewMode === 'simple' || viewMode === 'groups' || noQuickEdit ? 100 / columns : 100}%;">
+<div class="main" class:active class:focused data-slide-index={index} data-show-id={showId} style="{output?.color ? 'outline: 2px solid ' + getOutputColor(output.color) + ';' : ''}width: {viewMode === 'grid' || viewMode === 'simple' || viewMode === 'groups' || noQuickEdit ? 100 / columns : 100}%;">
     <!-- group box -->
     {#if $fullColors}
         <div class="group_box" style="background-color: {color};" />
