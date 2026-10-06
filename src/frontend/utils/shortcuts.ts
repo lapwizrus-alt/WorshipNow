@@ -133,10 +133,12 @@ const keys = {
             if (lastUsedProject) openProject(lastUsedProject.id)
         }
     },
-    Delete: () => (get(contextActive) ? null : deleteAction(get(selected), "remove")),
+    // WorshipNow: Delete removes selected slides from the presentation, like ProPresenter (Ctrl+Z undoes)
+    Delete: () => (get(contextActive) ? null : deleteAction(get(selected), get(selected).id === "slide" ? "delete" : "remove")),
     Backspace: () => keys.Delete(),
     // give time so it don't clear slide
-    F2: () => (get(focusMode) ? null : setTimeout(() => menuClick("rename", true, null, null, null, get(selected)))),
+    // (F2 on a selected slide is "Clear Slide", handled by the preview shortcuts)
+    F2: () => (get(focusMode) || get(selected).id === "slide" ? null : setTimeout(() => menuClick("rename", true, null, null, null, get(selected)))),
     // default menu "togglefullscreen" role not working in production on Windows/Linux
     F11: () => (get(os).platform !== "darwin" ? sendMain(Main.FULLSCREEN) : null)
 }
@@ -362,7 +364,7 @@ export const previewShortcuts = {
     },
     F2: () => {
         // return if "rename" is selected
-        if (get(outLocked) || (get(selected).id && get(selected).id !== "scripture" && !get(focusMode))) return false
+        if (get(outLocked) || (get(selected).id && get(selected).id !== "scripture" && get(selected).id !== "slide" && !get(focusMode))) return false
         if (presentationControllersKeysDisabled()) return false
 
         clearSlide()

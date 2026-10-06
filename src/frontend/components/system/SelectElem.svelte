@@ -151,6 +151,20 @@
             return
         }
 
+        // WorshipNow: slides select like ProPresenter. A plain click selects that one slide (and goes live),
+        // Ctrl/Cmd-click adds or removes, Shift-click selects a range, and selection stays within one presentation.
+        if (id === "slide" && !dragged && !rightClick) {
+            const otherShow = $selected.id === "slide" && !!$selected.data?.[0]?.showId && !!data?.showId && $selected.data[0].showId !== data.showId
+            if (otherShow || !(e.ctrlKey || e.metaKey || e.shiftKey)) {
+                selected.set({ id, data: [data] })
+                return
+            }
+        }
+        if (id === "slide" && rightClick && $selected.id === "slide" && $selected.data?.[0]?.showId && data?.showId && $selected.data[0].showId !== data.showId) {
+            selected.set({ id, data: [data] })
+            return
+        }
+
         // shift select range
         if (e.shiftKey && ((shiftRange.length && $selected.data[0]) || $selected.data[0]?.index !== undefined)) {
             const searchKeys = ["id", "index", "path"]
@@ -169,8 +183,8 @@
                     .map((_, idx) => start + idx)
             }
 
-            // nothing in between
-            if (newIndex - 1 === lastSelectedIndex || newIndex + 1 === lastSelectedIndex) selectedBetween = [selectedBetween[0]]
+            // nothing in between (WorshipNow: adjacent or same item used to add a wrong extra item)
+            if (Math.abs(newIndex - lastSelectedIndex) <= 1) selectedBetween = []
 
             let dataBetween = selectedBetween.map((index) => (shiftRange.length ? shiftRange[index] : { index }))
             let allNewData = [...$selected.data, ...dataBetween, data]

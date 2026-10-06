@@ -2318,6 +2318,10 @@ function changeSlideAction(obj: ObjData, id: string) {
 export async function removeSlide(initialData: any[], type: "delete" | "remove" = "delete") {
     if (!Array.isArray(initialData)) return
 
+    // WorshipNow: only act on slides of the selected presentation (the playlist view shows many at once)
+    const activeShowId = get(activeShow)?.id || ""
+    initialData = initialData.filter((a: any) => !a?.showId || a.showId === activeShowId)
+
     const ref = getLayoutRef()
     const parents: any[] = []
     const childs: any[] = []

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { AudioPlayer } from "../../audio/audioPlayer"
     import { cameraManager } from "../../media/cameraManager"
+    import { clipboard } from "../../stores"
     import { actions, activeEdit, activeProject, activeRecording, activeShow, categories, colorbars, dictionary, disabledServers, drawerTabsData, effects, effectsLibrary, events, forceClock, globalTags, livePrepare, media, mediaFolders, os, outputs, overlayCategories, overlays, projects, redoHistory, scenes, scriptures, selected, shows, showsCache, slideDeleteHighlight, slidesOptions, special, spellcheck, stageShows, styles, templateCategories, timers, topContextActive, undoHistory } from "../../stores"
     import { translateText } from "../../utils/language"
     import { closeContextMenu } from "../../utils/shortcuts"
@@ -187,6 +188,11 @@
         },
         undo: () => {
             if (!$undoHistory.length) disabled = true
+        },
+        // WorshipNow: on a slide, Paste only works when slides have been copied
+        paste: () => {
+            const onSlide = !!contextElem?.classList?.value?.match(/#slide(Child)?\b/)
+            if (onSlide && $clipboard?.id !== "slide" && $clipboard?.id !== "group") disabled = true
         },
         redo: () => {
             if (!$redoHistory.length) disabled = true

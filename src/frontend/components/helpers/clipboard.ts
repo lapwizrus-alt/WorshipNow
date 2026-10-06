@@ -459,14 +459,19 @@ const copyActions = {
         return [...items]
     },
     slide: (data: any, fullGroup = false) => {
-        const ref = getLayoutRef()
-        const layouts: any[] = []
-        const mediaData: any = {}
-
         // dont know why this is like this when ctrl + c
         if (data.slides) data = data.slides
 
         if (!Array.isArray(data)) return { slides: [], layouts: [], media: {} }
+
+        // WorshipNow: copy from the song the slides were selected in (the playlist view shows many songs)
+        const sourceShowId: string = data.find((a) => a?.showId)?.showId || get(activeShow)?.id || ""
+        data = data.filter((a) => !a?.showId || a.showId === sourceShowId)
+        const _src = () => _show(sourceShowId || "active")
+
+        const ref = getLayoutRef(sourceShowId || "active")
+        const layouts: any[] = []
+        const mediaData: any = {}
 
         const sortedData = data.sort((a, b) => (a.index < b.index ? -1 : 1))
 
@@ -483,7 +488,7 @@ const copyActions = {
 
         if (fullGroup) {
             // select all children of group
-            const allSlides = _show().get("slides")
+            const allSlides = _src().get("slides")
             const newIds: string[] = []
             ids.forEach((id: string) => {
                 const children = allSlides[id]?.children || []
@@ -492,7 +497,7 @@ const copyActions = {
             ids = removeDuplicates(newIds)
         }
 
-        let slides = clone(_show().slides(ids).get())
+        let slides = clone(_src().slides(ids).get())
         slides = slides.map((slide) => {
             if (slide.group !== null) return slide
 
@@ -501,17 +506,25 @@ const copyActions = {
             delete slide.children
 
             const parent = ref.find((a) => a.id === slide.id)?.parent || ""
+            // (WorshipNow: the ref parent is an object, compare by id)
+            const parentId: string = typeof parent === "string" ? parent : (parent as any)?.id || ""
             // check that parent is not copied
-            if (ids.includes(parent)) return slide
+            if (ids.includes(parentId)) return slide
 
             // slide.group = ""
             slide.oldChild = slide.id
+
+            // WorshipNow: remember the group label so a pasted slide keeps it (like ProPresenter)
+            const parentSlide = parentId ? _src().slides([parentId]).get()?.[0] : null
+            if (parentSlide) {
+                slide.wnGroup = { group: parentSlide.group, color: parentSlide.color, globalGroup: parentSlide.globalGroup }
+            }
 
             return slide
         })
 
         const layoutMedia = layouts.filter((a) => a.background || a.audio?.length)
-        const showMedia = _show().get()?.media || {}
+        const showMedia = _src().get()?.media || {}
         layoutMedia.forEach((layoutData) => {
             const mediaIds: string[] = []
             if (layoutData.background) mediaIds.push(layoutData.background)
@@ -523,7 +536,7 @@ const copyActions = {
             })
         })
 
-        return { slides, layouts, media: mediaData }
+        return { slides, layouts, media: mediaData, sourceShowId }
     },
     group: (data: any) => copyActions.slide(data, true),
     overlay: (data: any) => {
@@ -603,6 +616,14 @@ const pasteActions = {
     slide: (data: any, { index }: any = {}, isDuplicating: boolean = false) => {
         if (!data?.slides) return
 
+        // WorshipNow: like ProPresenter, paste after the selected slide (or at the end when nothing is selected)
+        const targetShow = get(activeShow)
+        if (!targetShow?.id || (targetShow.type || "show") !== "show" || !get(showsCache)[targetShow.id]) {
+            newToast("Select a presentation to paste the slides into")
+            return
+        }
+        if (index === undefined) index = getPasteIndex(targetShow.id)
+
         data = clone(data)
         const copiedIds: string[] = data.slides.map((a) => a.id)
         const newSlides: any[] = []
@@ -611,7 +632,13 @@ const pasteActions = {
 
         data.slides.forEach((slide, i) => {
             if (slide.group === null && addedChildren.includes(slide.id)) return
-            if (!isDuplicating && slide.group === null) slide.group = ""
+            if (!isDuplicating && slide.group === null) {
+                // WorshipNow: keep the group label of the group it was copied from
+                slide.group = slide.wnGroup?.group ?? ""
+                if (slide.wnGroup?.color) slide.color = slide.wnGroup.color
+                if (slide.wnGroup?.globalGroup) slide.globalGroup = slide.wnGroup.globalGroup
+            }
+            delete slide.wnGroup
 
             slide.id = uid()
             const slideIndex = newSlides.length
@@ -1349,6 +1376,15 @@ const duplicateActions = {
             return a
         })
     }
+}
+
+// WorshipNow: index of the last selected slide in the target show (paste goes after it)
+function getPasteIndex(showId: string): number | undefined {
+    const sel = get(selected)
+    if (sel.id !== "slide" || !Array.isArray(sel.data) || !sel.data.length) return undefined
+    const indexes = sel.data.filter((a: any) => !a?.showId || a.showId === showId).map((a: any) => a?.index).filter((i: any) => typeof i === "number")
+    if (!indexes.length) return undefined
+    return Math.max(...indexes)
 }
 
 function pasteDrawerItem(data: any, type: "overlay" | "template" | "scene") {
